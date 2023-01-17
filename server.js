@@ -2,17 +2,22 @@
 
 const axios = require('axios');
 const SorobanClient = require('soroban-client')
+const StellarSdk = require("stellar-sdk");
+const {formatInTimeZone} = require('date-fns-tz')
 
 const NetworkConfig = {
   rpc_url: process.env.RPC_URL,
+  horizon_url: process.env.HORIZON_URL,
   ifttt_webhook_url: process.env.IFTTT_WEBHOOK_URL
 }
 
 async function eventLoop() {
   console.log('IFTTT Event loop started ');
   let rpcServer
+  let horizonServer
   try {
     rpcServer = new SorobanClient.Server(NetworkConfig.rpc_url, {allowHttp: true});
+    horizonServer = new StellarSdk.Server(NetworkConfig.horizon_url, {allowHttp: true});
   } catch (error) {
     console.log('init error ');
     console.log(error);
@@ -27,7 +32,8 @@ async function eventLoop() {
 
   */
 
-  let latestLedger = 0;
+  let horizonLatestLedger = await horizonServer.ledgers().limit(1).order("desc").call();
+  let latestLedger = horizonLatestLedger.records.length > 0 ? horizonLatestLedger.records[0].sequence : 0;
   let pagingToken = null;
   while (true) {
     try {
@@ -35,7 +41,6 @@ async function eventLoop() {
       let events = await rpcServer
           .getEvents(latestLedger, latestLedger + 10, [
              {
-              // 2 topics on event, "ifttt_evt" , "gdoc"
               topics: [["aWZ0dHRfZXZlbnQK", "Z2RvYwo="]],
               type: "contract"
              } 
@@ -45,7 +50,12 @@ async function eventLoop() {
 
       for (evt in events) {
           console.log('processing contract event ' + evt.id);
-          //TODO
+          latestLedger = evt.ledger
+          pagingToken = evt.pagingToken
+          let parsedLine = SorobanClient.xdr.SCVal.fromXDR(evt.value.xdr, format='base64').obj().bin().toString('utf8');
+          let jsonPayload = { "value1" : parsedLine}
+          let resp = await axios.post(NetworkConfig.ifttt_webhook_url, jsonPayload);
+          console.log('successfully pushed ifttt webhook request for line ' + parsedLine);
       }
     } catch (err) {
         console.log('http services error, will retry from ledger ' + latestLedger);
@@ -57,5 +67,4 @@ async function eventLoop() {
 }
 
 eventLoop();
-
 
