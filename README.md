@@ -2,6 +2,10 @@
 
 Hack up [Stellar Soroban smart contract](https://soroban.stellar.org/docs) events integrated to IFTTT triggers and actions. 
 
+
+![system diagram image](hacka.png)
+
+
 Uses components:
 
 1. [IFTTT PaaS](https://ifttt.com).
