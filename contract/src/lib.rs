@@ -17,7 +17,7 @@ impl Contract {
         env.storage().set(COUNTER, count);
         let mut out: soroban_sdk::Vec<Symbol> = vec![&env];
         out.append(&to.clone());
-        env.events().publish((COUNTER, symbol!("poem")), to);
+        env.events().publish((symbol!("ifttt_evt"), symbol!("gdoc")), to);
         out
     }
 }
