@@ -23,11 +23,10 @@ fund-standalone:
 	curl "http://localhost:8000/friendbot?addr=$$(cat pubkey)"
 
 quickstart:
-	docker run --rm -it \
-		--platform linux/amd64 \
+	docker run --pull=always --rm -it \
 		-p 8000:8000 \
 		--name stellar \
-		stellar/quickstart:soroban-dev@sha256:c4429def497ed78ca99ae40c8e2522ec932081b4428df992900b5bc8d53bd642 \
+		stellar/quickstart:soroban-dev \
 		--$(NETWORK) \
 		--enable-soroban-rpc
 
