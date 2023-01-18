@@ -1,5 +1,8 @@
 all: compile 
 
+# unless explicitly specified otherwise, the network would default to futurenet.
+NETWORK ?= futurenet
+
 compile:
 	cd contract; cargo build --target wasm32-unknown-unknown --release; cd ..
 
