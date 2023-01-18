@@ -58,6 +58,9 @@ invoke:
 run: compile deploy invoke
 	echo "done"
 
+run-standalone: compile deploy-standalone invoke-standalone
+	echo "done"	
+
 run-dapp-service:
 	RPC_URL=$(RPC_URL) HORIZON_UR=$(HORIZON_URL) IFTTT_WEBHOOK_URL=$(IFTTT_WEBHOOK_URL) npm start	
 

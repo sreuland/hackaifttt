@@ -60,14 +60,17 @@ async function eventLoop() {
 
       startLedger = endLedger;
       pagingToken = null
-      for (evt in events) {
-          console.log('processing contract event ' + evt.id);
-          startLedger = Number(evt.ledger);
-          pagingToken = evt.pagingToken
-          let parsedLine = SorobanClient.xdr.SCVal.fromXDR(evt.value.xdr, format='base64').obj().bin().toString('utf8');
-          let jsonPayload = { "value1" : parsedLine}
-          let resp = await axios.post(NetworkConfig.ifttt_webhook_url, jsonPayload);
-          console.log('successfully pushed ifttt webhook request for line ' + parsedLine);
+      if (events != null) {
+        console.log("found " + events.length + " ifttt contract events")
+        for (const evt of events) {
+            console.log("processing contract event %j",evt);
+            startLedger = Number(evt.ledger);
+            pagingToken = evt.pagingToken
+            let parsedLine = SorobanClient.xdr.ScVal.fromXDR(input=evt.value.xdr, format='base64').obj().bin().toString('utf8');
+            let jsonPayload = { "value1" : parsedLine}
+            let resp = await axios.post(NetworkConfig.ifttt_webhook_url, jsonPayload);
+            console.log('successfully pushed ifttt webhook request for event line ' + parsedLine);
+        }
       }
 
     } catch (err) {
