@@ -48,7 +48,7 @@ async function eventLoop() {
     try {
       console.log('getting events for ledger range ' + startLedger + ' - ' + endLedger);
       let events = await rpcServer
-          .getEvents(String(startLedger), String(endLedger), [
+          .getEvents(startLedger, endLedger, [
              {
               // base64 encoded topic ScVal's
               topics: [["AAAABQAAAAlpZnR0dF9ldnQAAAA=", "AAAABQAAAARnZG9j"]],
