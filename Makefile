@@ -52,10 +52,11 @@ invoke-standalone:
 invoke:
 	./scripts/iterate.sh
 
+run: compile deploy invoke
+	echo "done"
+
 run-dapp-service:
 	RPC_URL=$(RPC_URL) HORIZON_UR=$(HORIZON_URL) IFTTT_WEBHOOK_URL=$(IFTTT_WEBHOOK_URL) npm start	
 
-run: compile test fund deploy invoke
-	echo "done"
 
 	
