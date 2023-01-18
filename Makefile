@@ -9,10 +9,10 @@ test: compile
 invoke-local: compile
 	soroban invoke --wasm contract/target/wasm32-unknown-unknown/release/ifttt_project.wasm \
 		--id 1 --fn publish \
-		--arg "[\"publish-that\", \"\"]"
+		--arg '["publishme"]'
 
 iterate: compile
-	./iterate-local.sh
+	./scripts/iterate-local.sh
 
 fund:
 	echo "funding account $$(cat pubkey)"
@@ -36,7 +36,7 @@ deploy:
     	--network-passphrase 'Test SDF Future Network ; October 2022' > contract-id.txt
 
 invoke:
-	./iterate.sh
+	./scripts/iterate.sh
 
 run: compile test fund deploy invoke
 	echo "done"

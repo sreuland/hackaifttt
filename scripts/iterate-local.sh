@@ -5,4 +5,4 @@ while read line; do
     if [ "$?" != "0" ]; then
         exit 1
     fi
-done <10-words.txt
+done <./poems/10-words.txt
