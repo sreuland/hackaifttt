@@ -24,39 +24,52 @@ async function eventLoop() {
     return
   }
 
+
   /*
 
    requires contract event data model:
-   topics: ["ifttt_evt", "gdoc"]
+   topics: [ScVal(ScSymbol("ifttt_evt")), ScVal(ScSymbol("gdoc"))]
    value: rust 'Bytes' - requested text line converted to utf8 byte array
 
   */
+ 
+  
+  let latestLedger = await getLatestLedger(horizonServer); 
+  while (latestLedger < 11) {
+    console.log('waiting for network to be at least 10 ledgers old, currently is at ' + latestLedger);
+    await new Promise(r => setTimeout(r, 3000));
+    latestLedger = getLatestLedger()
+  }
 
-  let horizonLatestLedger = await horizonServer.ledgers().limit(1).order("desc").call();
-  let latestLedger = horizonLatestLedger.records.length > 0 ? horizonLatestLedger.records[0].sequence : 0;
   let pagingToken = null;
+  let endLedger = latestLedger
+  let startLedger = latestLedger - 10
   while (true) {
     try {
-      console.log('getting events for ledger range ' + latestLedger + ' - ' + (latestLedger + 10));
+      console.log('getting events for ledger range ' + startLedger + ' - ' + endLedger);
       let events = await rpcServer
-          .getEvents(latestLedger, latestLedger + 10, [
+          .getEvents(String(startLedger), String(endLedger), [
              {
-              topics: [["aWZ0dHRfZXZlbnQK", "Z2RvYwo="]],
+              // base64 encoded topic ScVal's
+              topics: [["AAAABQAAAAlpZnR0dF9ldnQAAAA=", "AAAABQAAAARnZG9j"]],
               type: "contract"
              } 
            ],
            pagingToken,
            10);
 
+      startLedger = endLedger;
       for (evt in events) {
           console.log('processing contract event ' + evt.id);
-          latestLedger = evt.ledger
+          startLedger = Number(evt.ledger);
           pagingToken = evt.pagingToken
           let parsedLine = SorobanClient.xdr.SCVal.fromXDR(evt.value.xdr, format='base64').obj().bin().toString('utf8');
           let jsonPayload = { "value1" : parsedLine}
           let resp = await axios.post(NetworkConfig.ifttt_webhook_url, jsonPayload);
           console.log('successfully pushed ifttt webhook request for line ' + parsedLine);
       }
+      endLedger = startLedger + 1;
+
     } catch (err) {
         console.log('http services error, will retry from ledger ' + latestLedger);
         console.log(err);
@@ -64,6 +77,11 @@ async function eventLoop() {
       await new Promise(r => setTimeout(r, 3000));
     }
   }
+}
+
+async function getLatestLedger(horizonServer) {
+  let horizonLatestLedger = await horizonServer.ledgers().limit(1).order("desc").call();
+  return horizonLatestLedger.records.length > 0 ? horizonLatestLedger.records[0].sequence : 0;
 }
 
 eventLoop();
