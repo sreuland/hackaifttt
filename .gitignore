@@ -1,1 +1,4 @@
 node_modules
+contract-id.txt
+contract/Cargo.lock
+contract/target/
