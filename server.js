@@ -59,6 +59,7 @@ async function eventLoop() {
            10);
 
       startLedger = endLedger;
+      pagingToken = null
       for (evt in events) {
           console.log('processing contract event ' + evt.id);
           startLedger = Number(evt.ledger);
@@ -68,13 +69,16 @@ async function eventLoop() {
           let resp = await axios.post(NetworkConfig.ifttt_webhook_url, jsonPayload);
           console.log('successfully pushed ifttt webhook request for line ' + parsedLine);
       }
-      endLedger = startLedger + 1;
 
     } catch (err) {
         console.log('http services error, will retry from ledger ' + latestLedger);
         console.log(err);
     } finally {
-      await new Promise(r => setTimeout(r, 3000));
+      await new Promise(r => setTimeout(r, 7000));
+      endLedger = await getLatestLedger(horizonServer);
+      if (! endLedger > startLedger) {
+        startLedger = endLedger-1;
+      }
     }
   }
 }
