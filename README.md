@@ -23,11 +23,7 @@ Uses components:
 
 * Launch [quickstart image for soroban development](https://github.com/stellar/quickstart#soroban-development) on your local machine for `standalone` or `futurenet` networks:
    ```
-   # futurenet 
-   docker run --platform linux/amd64 --rm -it -p "8001:8000" --name stellar_futurenet stellar/quickstart:soroban-dev --futurenet --enable-soroban-rpc 
-
-   # local standalone 
-   docker run --platform linux/amd64 --rm -it -p "8000:8000" --name stellar_standalone stellar/quickstart:soroban-dev --standalone --enable-soroban-rpc 
+   make NETWORK={standalone|futurenet} quickstart
    ```
 
 * Use [Laboratory Generate Keypair](https://laboratory.stellar.org/#account-creator?) to generate a new test account key pair to be used as user account for deploying and invoking example contract using soroban cli:  
@@ -39,6 +35,10 @@ curl https://friendbot-futurenet.stellar.org/?addr=<keypair_public key>
 ```
 
 * start the local dapp service for hacka IFTTT demo, to push events to IFTTT.
+  ```
+  make RPC_URL=http://localhost:8000/soroban/rpc HORIZON_URL=http://localhost:8000 IFTTT_WEBHOOK_URL=https://maker.ifttt.com/trigger/invoke/with/key/<IFTTT_WEBHOOK_KEY> run-dapp-service
+
+  ```
 
 * Compile the smart contract to wasm 
     

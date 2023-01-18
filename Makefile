@@ -28,7 +28,7 @@ quickstart:
 		-p 8000:8000 \
 		--name stellar \
 		stellar/quickstart:soroban-dev@sha256:c4429def497ed78ca99ae40c8e2522ec932081b4428df992900b5bc8d53bd642 \
-		--futurenet \
+		--$(NETWORK) \
 		--enable-soroban-rpc
 
 deploy-standalone:
@@ -52,6 +52,9 @@ invoke-standalone:
 
 invoke:
 	./scripts/iterate.sh
+
+run-dapp-service:
+	RPC_URL=$(RPC_URL) HORIZON_UR=$(HORIZON_URL) IFTTT_WEBHOOK_URL=$(IFTTT_WEBHOOK_URL) npm start	
 
 run: compile test fund deploy invoke
 	echo "done"
