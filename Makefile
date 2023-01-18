@@ -53,7 +53,7 @@ invoke-standalone:
 invoke:
 	./scripts/iterate.sh
 
-run: compile test fund deploy invoke
+run: compile deploy invoke
 	echo "done"
 
 	
