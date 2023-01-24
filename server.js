@@ -35,15 +35,15 @@ async function eventLoop() {
  
   
   let latestLedger = await getLatestLedger(horizonServer); 
-  while (latestLedger < 11) {
-    console.log('waiting for network to be at least 10 ledgers old, currently is at ' + latestLedger);
+  while (latestLedger < 5) {
+    console.log('waiting for network to be at least 5 ledgers old, currently is at ' + latestLedger);
     await new Promise(r => setTimeout(r, 3000));
-    latestLedger = getLatestLedger()
+    latestLedger = await getLatestLedger(horizonServer)
   }
 
   let pagingToken = null;
   let endLedger = latestLedger
-  let startLedger = latestLedger - 10
+  let startLedger = latestLedger - 4
   while (true) {
     try {
       console.log('getting events for ledger range ' + startLedger + ' - ' + endLedger);
@@ -87,8 +87,13 @@ async function eventLoop() {
 }
 
 async function getLatestLedger(horizonServer) {
-  let horizonLatestLedger = await horizonServer.ledgers().limit(1).order("desc").call();
-  return horizonLatestLedger.records.length > 0 ? horizonLatestLedger.records[0].sequence : 0;
+  try {
+     let horizonLatestLedger = await horizonServer.ledgers().limit(1).order("desc").call();
+     return horizonLatestLedger.records.length > 0 ? horizonLatestLedger.records[0].sequence : 0;
+   } catch (error) {
+     return 0;
+   }
+
 }
 
 eventLoop();
