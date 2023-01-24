@@ -63,7 +63,7 @@ async function eventLoop() {
       if (events != null) {
         console.log("found " + events.length + " ifttt contract events")
         for (const evt of events) {
-            console.log("processing contract event %j",evt);
+            console.log("processing contract event %j",evt.id);
             startLedger = Number(evt.ledger);
             pagingToken = evt.pagingToken
             let parsedLine = SorobanClient.xdr.ScVal.fromXDR(input=evt.value.xdr, format='base64').obj().bin().toString('utf8');
