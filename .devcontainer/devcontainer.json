@@ -1,5 +1,5 @@
 {
-  "name": "Stellar RPC Dev",
+  "name": "dev container",
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
   
   "features": {
